@@ -1,0 +1,3078 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#4A78F5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>快乐学习小闯关 · 语文+数学+英语</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --blue:#4A78F5; --blue-d:#3560D8; --green:#2FBF85; --green-d:#249E6D;
+  --orange:#F28A2E; --orange-d:#D9761C; --red:#E85A5A; --yellow:#F5C928;
+  --purple:#8F6CF5; --pink:#F0628F; --sky:#2FA9E0;
+  --ink:#1E2233; --ink2:#434A63; --card:#FFFDF9; --line:#D3DBEE;
+  --safe-top:max(env(safe-area-inset-top, 0px), 26px);
+  --safe-bottom:max(env(safe-area-inset-bottom, 0px), 18px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'HarmonyOS Sans SC','PingFang SC','Microsoft YaHei',system-ui,-apple-system,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(165deg,#E4EEFF 0%,#EEE5FF 52%,#FFF3E4 100%);
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  touch-action:manipulation;-webkit-font-smoothing:antialiased;
+}
+#app{position:relative;height:100vh;height:100dvh;overflow:hidden;}
+
+/* 背景装饰 */
+.bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.bg span{position:absolute;font-size:42px;opacity:.5;animation:floaty 7s ease-in-out infinite;}
+.bg span:nth-child(1){left:4%;top:12%;}
+.bg span:nth-child(2){right:6%;top:8%;animation-delay:1.2s;}
+.bg span:nth-child(3){left:9%;bottom:14%;animation-delay:2.1s;font-size:34px;}
+.bg span:nth-child(4){right:10%;bottom:10%;animation-delay:.7s;font-size:38px;}
+.bg span:nth-child(5){left:46%;top:4%;animation-delay:1.8s;font-size:28px;}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-16px) rotate(3deg);}}
+
+/* 顶部状态栏 */
+.hud{
+  position:absolute;top:0;left:0;right:0;z-index:6;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-top) + 4px) 20px 6px;
+  font-weight:800;font-size:clamp(16px,2vw,22px);color:var(--ink2);pointer-events:none;
+}
+.hud .hud-left,.hud .hud-right{display:flex;align-items:center;gap:14px;pointer-events:auto;}
+.hud .stars-badge{background:#FFF7DA;border:2px solid #FFE28A;border-radius:999px;padding:4px 14px;color:#B07D00;font-weight:900;}
+.hud .level-badge{background:rgba(255,255,255,.75);border-radius:999px;padding:4px 14px;font-weight:800;}
+.hud button{background:none;border:none;font-size:24px;cursor:pointer;padding:6px;line-height:1;pointer-events:auto;}
+
+/* 屏幕容器 */
+.screen{
+  position:absolute;inset:0;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  padding:calc(var(--safe-top) + 50px) 20px calc(var(--safe-bottom) + 14px);
+  opacity:0;visibility:hidden;transform:translateY(10px);
+  transition:opacity .28s ease,transform .28s ease,visibility .28s;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.screen.active{opacity:1;visibility:visible;transform:translateY(0);}
+.content{width:min(1120px,96vw);flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0;}
+
+/* 首页 */
+#screen-home .content{gap:20px;text-align:center;align-items:center;}
+.hero{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.logo{font-size:clamp(62px,13vw,104px);line-height:1;filter:drop-shadow(0 10px 0 rgba(79,124,255,.18));animation:bounce 2.2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+h1.title{
+  font-size:clamp(32px,6.4vw,58px);font-weight:900;letter-spacing:2px;
+  background:linear-gradient(120deg,#3A63E0,#7C5CFF 45%,#FF7A45 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.subtitle{font-size:clamp(14px,2.4vw,19px);color:var(--ink2);font-weight:700;letter-spacing:.5px;}
+.home-card{
+  background:rgba(255,253,249,.94);border-radius:32px;padding:clamp(16px,3vw,26px);
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+  box-shadow:0 16px 36px rgba(80,100,180,.16);width:min(600px,92vw);
+}
+.home-info{font-size:clamp(14px,2.3vw,18px);color:var(--ink2);font-weight:700;line-height:1.6;}
+.home-info b{color:#B07D00;}
+.btn{
+  border:none;cursor:pointer;font-family:inherit;font-weight:900;
+  border-radius:20px;padding:16px 30px;font-size:clamp(19px,3.6vw,26px);
+  color:#fff;letter-spacing:1px;transition:transform .12s ease,box-shadow .12s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+}
+.btn:active{transform:scale(.96);}
+.btn.primary{background:linear-gradient(180deg,#6D96FF,#3A63E0);box-shadow:0 8px 0 #2A4FC2,0 14px 26px rgba(60,90,200,.35);}
+.btn.primary:active{box-shadow:0 4px 0 #2A4FC2;}
+.btn.green{background:linear-gradient(180deg,#5FE0AC,#2FB77A);box-shadow:0 8px 0 #22915F,0 14px 26px rgba(47,183,122,.3);}
+.btn.orange{background:linear-gradient(180deg,#FFB067,#F0821F);box-shadow:0 8px 0 #C96A14,0 14px 26px rgba(240,130,31,.3);}
+.btn.ghost{background:#fff;color:var(--blue);border:3px solid #D7E2FF;box-shadow:0 5px 0 #D7E2FF;font-size:clamp(16px,2.8vw,21px);padding:13px 24px;border-radius:18px;}
+.btn.ghost:active{box-shadow:0 2px 0 #D7E2FF;}
+.btn.wide{width:min(420px,86vw);}
+.reset-link{background:none;border:none;color:#9AA3C0;font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer;padding:4px;font-family:inherit;}
+
+/* 答题 */
+.quiz-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.pill{border-radius:999px;padding:6px 16px;font-weight:900;font-size:clamp(14px,2.2vw,18px);}
+.pill-math{background:#E8EEFF;color:#3A63E0;}
+.pill-cn{background:#FFEDE0;color:#E26A00;}
+.pill-en{background:#E3FBEF;color:#17764B;}
+.qmeta{display:flex;align-items:center;gap:10px;font-size:clamp(13px,2vw,16px);color:var(--ink2);font-weight:800;}
+.diff{background:rgba(255,255,255,.75);border-radius:999px;padding:4px 12px;color:#8A93B0;font-size:clamp(11px,1.8vw,14px);}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.dots .dot{width:10px;height:10px;border-radius:50%;background:#D7DEF2;}
+.dots .dot.done{background:var(--green);}
+.dots .dot.cur{background:var(--blue);transform:scale(1.3);}
+.q-card{
+  background:rgba(255,255,255,.92);border-radius:30px;
+  padding:clamp(16px,3.2vw,28px);box-shadow:0 18px 40px rgba(90,110,200,.16);
+  display:flex;flex-direction:column;gap:clamp(12px,2.2vw,20px);width:100%;
+}
+.q-line{display:flex;align-items:center;gap:12px;}
+.q-text{font-size:clamp(23px,4.8vw,40px);font-weight:900;line-height:1.3;flex:1;word-break:break-word;}
+.read-btn{background:#EEF3FF;border:none;border-radius:16px;font-size:clamp(20px,3.6vw,26px);padding:8px 12px;cursor:pointer;flex:none;}
+.read-btn:active{transform:scale(.94);}
+.q-col{flex:1;display:flex;flex-direction:column;gap:12px;align-items:flex-start;min-width:0;}
+.q-col .q-text{flex:none;}
+.listen-btn{margin:2px 0 0;background:linear-gradient(180deg,#FFD06B,#F5A623);color:#5A3B00;box-shadow:0 6px 0 #C97F0E;border-radius:18px;padding:12px 28px;font-size:clamp(17px,2.6vw,24px);}
+.listen-btn:active{box-shadow:0 3px 0 #C97F0E;transform:scale(.97);}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2vw,16px);}
+.opt{
+  border:3px solid var(--line);background:#fff;border-radius:20px;
+  font-family:inherit;font-weight:900;font-size:clamp(18px,3.2vw,28px);
+  color:var(--ink);padding:clamp(13px,2.4vw,20px) 10px;cursor:pointer;
+  transition:transform .12s,border-color .15s,background .15s,box-shadow .15s;
+  box-shadow:0 5px 0 var(--line);min-height:62px;
+}
+.opt:active{transform:scale(.97);}
+.opt.correct{background:#E3FBEF;border-color:var(--green);box-shadow:0 5px 0 var(--green);color:#17764B;animation:pulse .5s ease;}
+.opt.wrong{background:#FFECEC;border-color:var(--red);box-shadow:0 5px 0 var(--red);color:#B02A2A;}
+.opt:disabled{cursor:default;opacity:1;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.06);}100%{transform:scale(1);}}
+.tip{
+  display:none;background:#FFF7DA;border:2px solid #FFE28A;border-radius:18px;
+  padding:12px 18px;font-size:clamp(14px,2.4vw,19px);font-weight:800;color:#8A6500;line-height:1.55;
+}
+.tip.show{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.next-row{display:flex;justify-content:center;}
+.next-row .btn{min-width:min(340px,82vw);}
+.hidden{display:none !important;}
+
+/* 小游戏 */
+#screen-game{padding-top:calc(env(safe-area-inset-top,0px) + 58px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px);}
+#screen-game .content{gap:10px;justify-content:flex-start;}
+.game-top{
+  background:rgba(255,255,255,.9);border-radius:22px;padding:10px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  box-shadow:0 8px 22px rgba(90,110,200,.12);
+}
+.game-top .label{font-size:clamp(12px,2vw,15px);font-weight:800;color:var(--ink2);}
+.game-top .score{font-size:clamp(18px,3vw,24px);font-weight:900;color:#E26A00;}
+.hearts{font-size:clamp(19px,3.2vw,27px);letter-spacing:2px;line-height:1;}
+.timerbar{height:12px;border-radius:8px;background:#E4E9F7;overflow:hidden;width:100%;}
+.timerbar i{display:block;height:100%;width:100%;border-radius:8px;background:linear-gradient(90deg,#3ECF8E,#FFD93D);transition:width .35s linear;}
+.timerbar i.low{background:linear-gradient(90deg,#FFD93D,#FF6B6B);}
+.target-card{
+  background:linear-gradient(180deg,#FFFFFF,#F3F7FF);border-radius:24px;
+  padding:12px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 10px 26px rgba(90,110,200,.14);width:100%;
+}
+.target-card .prompt{font-size:clamp(12px,2vw,16px);font-weight:800;color:var(--ink2);}
+.target-card .target{font-size:clamp(26px,5.2vw,46px);font-weight:900;color:var(--blue);letter-spacing:1px;line-height:1.15;text-align:center;word-break:break-word;}
+.target-card .target.long{font-size:clamp(18px,3.6vw,28px);letter-spacing:0;}
+.bubble-area{
+  position:relative;flex:1;min-height:0;width:100%;
+  background:rgba(255,255,255,.5);border-radius:26px;overflow:hidden;
+  border:3px solid rgba(255,255,255,.7);
+}
+.bubble{
+  position:absolute;left:0;top:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:900;cursor:pointer;user-select:none;
+  box-shadow:inset -6px -8px 0 rgba(0,0,0,.14),0 8px 16px rgba(70,90,180,.3);
+  transition:transform .12s ease,opacity .2s ease;will-change:top,left;
+  padding:4px;text-align:center;line-height:1.05;
+}
+.bubble:active{transform:scale(.94);}
+.bubble.pop{animation:bubblePop .26s ease forwards;}
+@keyframes bubblePop{0%{transform:scale(1);opacity:1;}60%{transform:scale(1.5);opacity:.85;}100%{transform:scale(1.9);opacity:0;}}
+.bubble.shake{animation:bubbleShake .4s ease;}
+@keyframes bubbleShake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px) rotate(-6deg);}40%{transform:translateX(8px) rotate(6deg);}60%{transform:translateX(-6px) rotate(-4deg);}80%{transform:translateX(6px) rotate(4deg);}}
+.bubble.fade{opacity:0;transform:scale(.7);}
+.float-star{position:absolute;font-size:24px;font-weight:900;color:#E2A100;pointer-events:none;animation:floatUp .7s ease forwards;z-index:9;}
+@keyframes floatUp{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(-70px) scale(1.5);}}
+.quit-btn{position:absolute;right:74px;top:calc(var(--safe-top) + 2px);z-index:7;background:rgba(255,255,255,.92);border:none;border-radius:50%;width:44px;height:44px;font-size:19px;font-weight:900;color:#7C85A3;cursor:pointer;box-shadow:0 4px 10px rgba(90,110,200,.18);}
+
+/* 结果 */
+#screen-result .content{align-items:center;text-align:center;gap:14px;}
+.result-emoji{font-size:clamp(66px,13vw,110px);line-height:1;animation:popIn .5s cubic-bezier(.2,1.6,.4,1);}
+@keyframes popIn{from{transform:scale(.4);opacity:0;}to{transform:scale(1);opacity:1;}}
+.result-title{font-size:clamp(26px,4.8vw,40px);font-weight:900;color:var(--blue);}
+.result-stars{font-size:clamp(36px,8vw,64px);font-weight:900;color:#E2A100;letter-spacing:2px;animation:popIn .6s .1s backwards;}
+.result-detail{font-size:clamp(15px,2.6vw,20px);font-weight:800;color:var(--ink2);line-height:1.7;}
+.result-detail b{color:#E26A00;}
+.result-review{font-size:clamp(13px,2.2vw,17px);font-weight:700;color:#8A93B0;background:rgba(255,255,255,.7);padding:10px 18px;border-radius:999px;max-width:90vw;}
+.result-buttons{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+
+/* 彩带 & 提示 */
+.confetti{position:fixed;top:-24px;width:11px;height:17px;border-radius:3px;z-index:50;pointer-events:none;animation:confettiFall linear forwards;}
+@keyframes confettiFall{to{transform:translateY(112vh) rotate(760deg);}}
+#toast{
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);transform:translateX(-50%) translateY(20px);
+  background:rgba(43,47,66,.92);color:#fff;font-weight:800;font-size:15px;
+  padding:12px 22px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s ease;z-index:60;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* 响应式 */
+@media (max-width:560px){
+  .options{grid-template-columns:1fr;}
+  .q-card{padding:14px;}
+  .btn.wide{width:92vw;}
+}
+@media (orientation:landscape) and (max-height:560px){
+  .screen{padding-top:calc(env(safe-area-inset-top,0px) + 46px);padding-bottom:8px;}
+  .logo{display:none;}
+  #screen-home .content{gap:10px;}
+  .home-card{padding:12px;gap:10px;}
+  .q-card{padding:12px 16px;gap:10px;}
+  .q-text{font-size:clamp(19px,3.2vw,28px);}
+  .opt{min-height:52px;padding:10px;}
+  .target-card .target{font-size:clamp(20px,3.4vw,32px);}
+}
+
+/* ===== 华为 MatePad 11.5 等 3:2 平板优化（11.5 英寸 2.2K/2.8K 柔光屏） ===== */
+@media (min-width: 900px){
+  .content{width:min(1120px,94vw);gap:18px;}
+  .quit-btn{width:48px;height:48px;font-size:21px;right:84px;}
+  .hud{padding-left:26px;padding-right:26px;font-size:clamp(18px,1.8vw,22px);}
+  .hud .stars-badge,.hud .level-badge{padding:6px 18px;}
+  .hud button{font-size:28px;}
+  .q-card{padding:26px 32px;gap:clamp(14px,1.6vw,22px);}
+  .q-text{font-size:clamp(34px,4.4vw,52px);}
+  .opt{font-size:clamp(24px,2.8vw,34px);min-height:80px;padding:20px 14px;}
+  .pill{font-size:clamp(16px,1.8vw,21px);padding:8px 20px;}
+  .qmeta{font-size:clamp(15px,1.6vw,19px);gap:14px;}
+  .diff{font-size:clamp(13px,1.3vw,16px);padding:5px 14px;}
+  .dots{gap:8px;}
+  .dots .dot{width:12px;height:12px;}
+  .tip{font-size:clamp(17px,1.8vw,22px);padding:14px 22px;}
+  .btn{padding:18px 34px;font-size:clamp(21px,2.4vw,28px);}
+  .btn.ghost{font-size:clamp(17px,2vw,22px);padding:15px 26px;}
+  .btn.wide{width:min(460px,70vw);}
+  .hero{gap:14px;}
+  h1.title{font-size:clamp(44px,5.4vw,72px);}
+  .subtitle{font-size:clamp(16px,1.8vw,22px);}
+  .home-card{width:min(680px,80vw);padding:28px 32px;gap:20px;}
+  .home-info{font-size:clamp(16px,1.9vw,21px);}
+  .result-emoji{font-size:clamp(80px,9vw,120px);}
+  .result-title{font-size:clamp(32px,4vw,46px);}
+  .result-detail{font-size:clamp(18px,2vw,24px);}
+  .result-review{font-size:clamp(15px,1.7vw,19px);}
+  .result-buttons .btn{padding:16px 28px;}
+  .target-card{padding:16px 26px;border-radius:26px;}
+  .target-card .prompt{font-size:clamp(14px,1.5vw,18px);}
+  .target-card .target{font-size:clamp(30px,3.8vw,54px);}
+  .target-card .target.long{font-size:clamp(22px,2.8vw,34px);}
+  .game-top{padding:14px 24px;}
+  .game-top .label{font-size:clamp(13px,1.4vw,16px);}
+  .game-top .score{font-size:clamp(22px,2.4vw,30px);}
+  .hearts{font-size:clamp(22px,2.6vw,32px);}
+}
+@media (orientation: landscape) and (min-width: 900px){
+  /* 横屏：首页左右分栏，答题左题目右选项，充分利用 3:2 宽屏 */
+  #screen-home .content{flex-direction:row;align-items:center;justify-content:center;gap:clamp(40px,5vw,96px);}
+  .q-card{
+    display:grid;
+    grid-template-columns:1.12fr 1fr;
+    grid-template-areas:"q opts" "tip tip" "next next";
+    align-items:center;
+    column-gap:clamp(20px,2.4vw,36px);
+    row-gap:16px;
+  }
+  .q-line{grid-area:q;align-items:flex-start;}
+  .options{grid-area:opts;align-content:center;}
+  .tip{grid-area:tip;}
+  .next-row{grid-area:next;}
+}
+@media (min-width: 1200px){
+  .content{width:min(1240px,92vw);}
+  .opt{min-height:88px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bg" aria-hidden="true"><span>☁️</span><span>⭐</span><span>🌈</span><span>🎈</span><span>✨</span></div>
+
+  <header class="hud">
+    <div class="hud-left">
+      <span class="stars-badge">⭐ <span id="hudStars">0</span></span>
+      <span class="level-badge" id="hudLevel">第 1 关</span>
+    </div>
+    <div class="hud-right">
+      <button id="hudSound" aria-label="声音开关">🔊</button>
+    </div>
+  </header>
+
+  <!-- 首页 -->
+  <section class="screen active" id="screen-home">
+    <div class="content">
+      <div class="hero">
+        <div class="logo" aria-hidden="true">🦉</div>
+        <h1 class="title">快乐学习小闯关</h1>
+        <p class="subtitle">语文 10 题 + 数学 10 题 + 英语 10 题 · 答错的多练几遍，慢慢变难</p>
+      </div>
+      <div class="home-card">
+        <p class="home-info" id="homeInfo"></p>
+        <button class="btn primary wide" id="btnStart">🚀 开始闯关</button>
+        <button class="reset-link" id="btnReset">重新开始（清空星星和错题记录）</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 答题 -->
+  <section class="screen" id="screen-quiz">
+    <div class="content">
+      <div class="quiz-top">
+        <span class="pill pill-cn" id="quizSubject">📖 语文</span>
+        <span class="qmeta"><span id="quizQNum">第 1 / 10 题</span><span class="diff" id="quizDiff">难度 ★☆☆</span></span>
+      </div>
+      <span class="dots" id="quizProgress"></span>
+      <div class="q-card">
+        <div class="q-line">
+          <div class="q-col">
+            <div class="q-text" id="quizQuestion">题目</div>
+            <button class="btn listen-btn hidden" id="quizListen">🔊 点这里再听一遍</button>
+          </div>
+          <button class="read-btn" id="quizRead" aria-label="朗读题目">🔊</button>
+        </div>
+        <div class="options" id="quizOptions"></div>
+        <div class="tip" id="quizTip"></div>
+        <div class="next-row"><button class="btn green hidden" id="quizNext">下一题 ➜</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 小游戏 -->
+  <section class="screen" id="screen-game">
+    <button class="quit-btn" id="btnQuit" aria-label="退出小游戏">✕</button>
+    <div class="content">
+      <div class="game-top">
+        <div><div class="label">小游戏得分</div><div class="score" id="gameScore">0</div></div>
+        <div class="hearts" id="gameHearts">❤️❤️❤️</div>
+        <div style="flex:1;min-width:140px;max-width:320px;">
+          <div class="label" style="margin-bottom:4px;">剩余时间</div>
+          <div class="timerbar"><i id="timerFill"></i></div>
+        </div>
+      </div>
+      <div class="target-card">
+        <span class="prompt" id="gamePrompt">找出正确答案</span>
+        <span class="target" id="gameTarget">题目</span>
+      </div>
+      <div class="bubble-area" id="bubbleArea"></div>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section class="screen" id="screen-result">
+    <div class="content">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-title" id="resultTitle">完成！</div>
+      <div class="result-stars" id="resultStars">+0 ⭐</div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="result-review" id="resultReview"></div>
+      <div class="result-buttons" id="resultButtons"></div>
+    </div>
+  </section>
+
+  <div id="toast"></div>
+</div>
+<script>
+'use strict';
+/* =========================================================
+ *  快乐学习小闯关 v2
+ *  每关 = 语文 10 题 + 数学 10 题 + 英语 10 题
+ *  每科 10 题答完 → 玩一次知识泡泡小游戏 → 下一科 → 结算
+ *  自适应：答错的题以后出现得更多，答对的题减少；难度逐级提升
+ * ========================================================= */
+
+/* ---------------- 工具函数 ---------------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const rand = (a, b) => a + Math.random() * (b - a);
+const randInt = (a, b) => Math.floor(rand(a, b + 1));
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ---------------- 本地存储 ---------------- */
+const store = {
+  get(k, def) {
+    try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); }
+    catch (e) { return def; }
+  },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ---------------- 题库（由 tools/build.py 从 questions.json 生成，请勿手改） ---------------- */
+/* BANK_START */
+const QUESTION_BANK = {
+  "meta": {
+    "version": "1.1.0",
+    "updated": "2026-11-03",
+    "note": "更新题库后运行 python tools/build.py 同步到网页版与两个鸿蒙工程。",
+    "perSubjectPerLevel": 10,
+    "subjects": [
+      "chinese",
+      "math",
+      "english"
+    ]
+  },
+  "questions": [
+    {
+      "id": "cn001",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "b + ā 拼成什么？",
+      "read": "b和a拼成什么？",
+      "options": [
+        "bā",
+        "pā",
+        "mā",
+        "dā"
+      ],
+      "answer": "bā",
+      "explain": "b和ā拼成bā，第一声。"
+    },
+    {
+      "id": "cn002",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "m + ǎ 拼成什么？",
+      "read": "m和a拼成什么，第三声？",
+      "options": [
+        "mā",
+        "má",
+        "mǎ",
+        "mà"
+      ],
+      "answer": "mǎ",
+      "explain": "m和ǎ拼成mǎ，第三声，比如“马”。"
+    },
+    {
+      "id": "cn003",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "d + à 拼成什么？",
+      "read": "d和a拼成什么，第四声？",
+      "options": [
+        "dā",
+        "dá",
+        "dǎ",
+        "dà"
+      ],
+      "answer": "dà",
+      "explain": "d和à拼成dà，第四声，比如“大”。"
+    },
+    {
+      "id": "cn004",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "n + ǚ 拼成什么？",
+      "read": "n和鱼拼成什么？",
+      "options": [
+        "nǚ",
+        "nǔ",
+        "nū",
+        "nù"
+      ],
+      "answer": "nǚ",
+      "explain": "n和ǚ拼成nǚ，就是“女”的读音。"
+    },
+    {
+      "id": "cn005",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "“大”的反义词是？",
+      "read": "大的反义词是什么？",
+      "options": [
+        "小",
+        "多",
+        "高",
+        "长"
+      ],
+      "answer": "小",
+      "explain": "大和小是反义词。"
+    },
+    {
+      "id": "cn006",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "“上”的反义词是？",
+      "read": "上的反义词是什么？",
+      "options": [
+        "下",
+        "左",
+        "右",
+        "中"
+      ],
+      "answer": "下",
+      "explain": "上和下是反义词。"
+    },
+    {
+      "id": "cn007",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "“多”的反义词是？",
+      "read": "多的反义词是什么？",
+      "options": [
+        "少",
+        "大",
+        "高",
+        "长"
+      ],
+      "answer": "少",
+      "explain": "多和少是反义词。"
+    },
+    {
+      "id": "cn008",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "一( )马",
+      "read": "一什么马？",
+      "options": [
+        "匹",
+        "只",
+        "头",
+        "条"
+      ],
+      "answer": "匹",
+      "explain": "一匹马，马用“匹”做量词。"
+    },
+    {
+      "id": "cn009",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "一( )鱼",
+      "read": "一什么鱼？",
+      "options": [
+        "条",
+        "只",
+        "匹",
+        "头"
+      ],
+      "answer": "条",
+      "explain": "一条鱼，鱼用“条”做量词。"
+    },
+    {
+      "id": "cn010",
+      "subject": "chinese",
+      "difficulty": 1,
+      "question": "“太阳”的“阳”是哪一个？",
+      "read": "太阳的阳是哪一个？",
+      "options": [
+        "阳",
+        "阴",
+        "明",
+        "晴"
+      ],
+      "answer": "阳",
+      "explain": "“太阳”的“阳”就是“阳”字。"
+    },
+    {
+      "id": "cn011",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "j、i、a 拼成什么？",
+      "read": "j、i、a拼成什么？",
+      "options": [
+        "jiā",
+        "qiā",
+        "xiā",
+        "jiē"
+      ],
+      "answer": "jiā",
+      "explain": "j、i、a拼成jiā，这是三拼音节。"
+    },
+    {
+      "id": "cn012",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "ch + a 拼成什么？",
+      "read": "ch和a拼成什么？",
+      "options": [
+        "chā",
+        "zhā",
+        "shā",
+        "cā"
+      ],
+      "answer": "chā",
+      "explain": "ch和a拼成chā，比如“叉”。"
+    },
+    {
+      "id": "cn013",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "“黑”的反义词是？",
+      "read": "黑的反义词是什么？",
+      "options": [
+        "白",
+        "红",
+        "亮",
+        "暗"
+      ],
+      "answer": "白",
+      "explain": "黑和白是反义词。"
+    },
+    {
+      "id": "cn014",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "“冷”的反义词是？",
+      "read": "冷的反义词是什么？",
+      "options": [
+        "热",
+        "暖",
+        "凉",
+        "寒"
+      ],
+      "answer": "热",
+      "explain": "冷和热是反义词。"
+    },
+    {
+      "id": "cn015",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "一( )书",
+      "read": "一什么书？",
+      "options": [
+        "本",
+        "张",
+        "支",
+        "把"
+      ],
+      "answer": "本",
+      "explain": "一本书，书用“本”做量词。"
+    },
+    {
+      "id": "cn016",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "一( )树",
+      "read": "一什么树？",
+      "options": [
+        "棵",
+        "根",
+        "只",
+        "把"
+      ],
+      "answer": "棵",
+      "explain": "一棵树，树用“棵”做量词。"
+    },
+    {
+      "id": "cn017",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "一( )伞",
+      "read": "一什么伞？",
+      "options": [
+        "把",
+        "张",
+        "支",
+        "条"
+      ],
+      "answer": "把",
+      "explain": "一把伞，伞用“把”做量词。"
+    },
+    {
+      "id": "cn018",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "床前明月光，疑是地上( )",
+      "read": "床前明月光，疑是地上什么？",
+      "options": [
+        "霜",
+        "雪",
+        "光",
+        "水"
+      ],
+      "answer": "霜",
+      "explain": "疑是地上霜，出自李白的《静夜思》。"
+    },
+    {
+      "id": "cn019",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "“春眠不觉晓，处处闻啼鸟”的下一句是？",
+      "read": "春眠不觉晓，处处闻啼鸟，下一句是什么？",
+      "options": [
+        "夜来风雨声",
+        "白日依山尽",
+        "举头望明月",
+        "春江水暖鸭先知"
+      ],
+      "answer": "夜来风雨声",
+      "explain": "出自孟浩然的《春晓》：夜来风雨声，花落知多少。"
+    },
+    {
+      "id": "cn020",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "“白日依山尽，黄河入海流”出自哪首诗？",
+      "read": "白日依山尽，黄河入海流，出自哪首诗？",
+      "options": [
+        "《登鹳雀楼》",
+        "《静夜思》",
+        "《咏鹅》",
+        "《春晓》"
+      ],
+      "answer": "《登鹳雀楼》",
+      "explain": "出自王之涣的《登鹳雀楼》。"
+    },
+    {
+      "id": "cn021",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "h、u、a 拼成什么？",
+      "read": "h、u、a拼成什么？",
+      "options": [
+        "huā",
+        "kuā",
+        "guā",
+        "shuā"
+      ],
+      "answer": "huā",
+      "explain": "h、u、a拼成huā，比如“花”。"
+    },
+    {
+      "id": "cn022",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "x、i、ao 拼成什么？",
+      "read": "x、i、ao拼成什么？",
+      "options": [
+        "xiāo",
+        "jiāo",
+        "qiāo",
+        "xiē"
+      ],
+      "answer": "xiāo",
+      "explain": "x、i、ao拼成xiāo，比如“小”读xiǎo，“笑”读xiào。"
+    },
+    {
+      "id": "cn023",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "“近”的反义词是？",
+      "read": "近的反义词是什么？",
+      "options": [
+        "远",
+        "进",
+        "前",
+        "后"
+      ],
+      "answer": "远",
+      "explain": "近和远是反义词。"
+    },
+    {
+      "id": "cn024",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "“粗”的反义词是？",
+      "read": "粗的反义词是什么？",
+      "options": [
+        "细",
+        "长",
+        "宽",
+        "短"
+      ],
+      "answer": "细",
+      "explain": "粗和细是反义词。"
+    },
+    {
+      "id": "cn025",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "“快”的反义词是？",
+      "read": "快的反义词是什么？",
+      "options": [
+        "慢",
+        "急",
+        "跑",
+        "走"
+      ],
+      "answer": "慢",
+      "explain": "快和慢是反义词。"
+    },
+    {
+      "id": "cn026",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "一( )花",
+      "read": "一什么花？",
+      "options": [
+        "朵",
+        "支",
+        "棵",
+        "片"
+      ],
+      "answer": "朵",
+      "explain": "一朵花，花用“朵”做量词。"
+    },
+    {
+      "id": "cn027",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "一( )画",
+      "read": "一什么画？",
+      "options": [
+        "幅",
+        "张",
+        "片",
+        "本"
+      ],
+      "answer": "幅",
+      "explain": "一幅画，画用“幅”做量词。"
+    },
+    {
+      "id": "cn028",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "“锄禾日当午，汗滴禾下土”出自哪首诗？",
+      "read": "锄禾日当午，汗滴禾下土，出自哪首诗？",
+      "options": [
+        "《悯农》",
+        "《咏鹅》",
+        "《静夜思》",
+        "《登鹳雀楼》"
+      ],
+      "answer": "《悯农》",
+      "explain": "出自李绅的《悯农》。"
+    },
+    {
+      "id": "cn029",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "“鹅，鹅，鹅，曲项向天歌”的下一句是？",
+      "read": "鹅鹅鹅，曲项向天歌，下一句是什么？",
+      "options": [
+        "白毛浮绿水",
+        "红掌拨清波",
+        "两个黄鹂鸣翠柳",
+        "飞流直下三千尺"
+      ],
+      "answer": "白毛浮绿水",
+      "explain": "出自《咏鹅》：白毛浮绿水，红掌拨清波。"
+    },
+    {
+      "id": "cn030",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "“国”字一共有几画？",
+      "read": "国字一共有几画？",
+      "options": [
+        "8画",
+        "7画",
+        "9画",
+        "10画"
+      ],
+      "answer": "8画",
+      "explain": "“国”字一共8画。"
+    },
+    {
+      "id": "ma001",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "3 + 4 = ?",
+      "read": "3加4等于几？",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "7",
+      "explain": "3和4合起来是7。"
+    },
+    {
+      "id": "ma002",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "2 + 5 = ?",
+      "read": "2加5等于几？",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "7",
+      "explain": "2和5合起来是7。"
+    },
+    {
+      "id": "ma003",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "9 - 3 = ?",
+      "read": "9减3等于几？",
+      "options": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "answer": "6",
+      "explain": "9里面去掉3，还剩6。"
+    },
+    {
+      "id": "ma004",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "6 + 2 = ?",
+      "read": "6加2等于几？",
+      "options": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "answer": "8",
+      "explain": "6和2合起来是8。"
+    },
+    {
+      "id": "ma005",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "10 - 4 = ?",
+      "read": "10减4等于几？",
+      "options": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "answer": "6",
+      "explain": "10减去4等于6。"
+    },
+    {
+      "id": "ma006",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "5 + 3 = ?",
+      "read": "5加3等于几？",
+      "options": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "answer": "8",
+      "explain": "5和3合起来是8。"
+    },
+    {
+      "id": "ma007",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "8 - 5 = ?",
+      "read": "8减5等于几？",
+      "options": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "answer": "3",
+      "explain": "8减5等于3。"
+    },
+    {
+      "id": "ma008",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "4 + 4 = ?",
+      "read": "4加4等于几？",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "8",
+      "explain": "4和4合起来是8。"
+    },
+    {
+      "id": "ma009",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "比 5 大、比 7 小的数是？",
+      "read": "比5大，比7小的数是几？",
+      "options": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "answer": "6",
+      "explain": "6在5和7中间。"
+    },
+    {
+      "id": "ma010",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "正方形有几条边？",
+      "read": "正方形有几条边？",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "answer": "4",
+      "explain": "正方形有4条边。"
+    },
+    {
+      "id": "ma011",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "8 + 7 = ?",
+      "read": "8加7等于几？",
+      "options": [
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "answer": "15",
+      "explain": "8加7等于15。"
+    },
+    {
+      "id": "ma012",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "12 - 5 = ?",
+      "read": "12减5等于几？",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "7",
+      "explain": "12减5等于7。"
+    },
+    {
+      "id": "ma013",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "9 + 6 = ?",
+      "read": "9加6等于几？",
+      "options": [
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "answer": "15",
+      "explain": "9加6等于15。"
+    },
+    {
+      "id": "ma014",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "16 - 8 = ?",
+      "read": "16减8等于几？",
+      "options": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "answer": "8",
+      "explain": "16减8等于8。"
+    },
+    {
+      "id": "ma015",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "7 + 8 = ?",
+      "read": "7加8等于几？",
+      "options": [
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "answer": "15",
+      "explain": "7加8等于15。"
+    },
+    {
+      "id": "ma016",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "13 - 6 = ?",
+      "read": "13减6等于几？",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "7",
+      "explain": "13减6等于7。"
+    },
+    {
+      "id": "ma017",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "6 + 7 = ?",
+      "read": "6加7等于几？",
+      "options": [
+        "12",
+        "13",
+        "14",
+        "15"
+      ],
+      "answer": "13",
+      "explain": "6加7等于13。"
+    },
+    {
+      "id": "ma018",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "找规律：2、4、6、8、( )",
+      "read": "找规律，2、4、6、8，下一个是几？",
+      "options": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "answer": "10",
+      "explain": "每次加2，所以下一个是10。"
+    },
+    {
+      "id": "ma019",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "比 12 大 3 的数是？",
+      "read": "比12大3的数是几？",
+      "options": [
+        "13",
+        "14",
+        "15",
+        "16"
+      ],
+      "answer": "15",
+      "explain": "12 + 3 = 15。"
+    },
+    {
+      "id": "ma020",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "20 - 9 = ?",
+      "read": "20减9等于几？",
+      "options": [
+        "10",
+        "11",
+        "12",
+        "13"
+      ],
+      "answer": "11",
+      "explain": "20减9等于11。"
+    },
+    {
+      "id": "ma021",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "15 + 8 = ?",
+      "read": "15加8等于几？",
+      "options": [
+        "22",
+        "23",
+        "24",
+        "25"
+      ],
+      "answer": "23",
+      "explain": "15加8等于23。"
+    },
+    {
+      "id": "ma022",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "34 - 17 = ?",
+      "read": "34减17等于几？",
+      "options": [
+        "16",
+        "17",
+        "18",
+        "19"
+      ],
+      "answer": "17",
+      "explain": "34减17等于17。"
+    },
+    {
+      "id": "ma023",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "8 + 9 + 2 = ?",
+      "read": "8加9再加2等于几？",
+      "options": [
+        "18",
+        "19",
+        "20",
+        "21"
+      ],
+      "answer": "19",
+      "explain": "8加9等于17，再加2等于19。"
+    },
+    {
+      "id": "ma024",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "24 + 16 = ?",
+      "read": "24加16等于几？",
+      "options": [
+        "38",
+        "39",
+        "40",
+        "41"
+      ],
+      "answer": "40",
+      "explain": "24加16等于40。"
+    },
+    {
+      "id": "ma025",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "找规律：5、10、15、20、( )",
+      "read": "找规律，5、10、15、20，下一个是几？",
+      "options": [
+        "21",
+        "25",
+        "30",
+        "35"
+      ],
+      "answer": "25",
+      "explain": "每次加5，所以下一个是25。"
+    },
+    {
+      "id": "ma026",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "一个数加上 9 得 17，这个数是？",
+      "read": "一个数加上9得17，这个数是几？",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answer": "8",
+      "explain": "17减9等于8。"
+    },
+    {
+      "id": "ma027",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "比 30 小 5 的数是？",
+      "read": "比30小5的数是几？",
+      "options": [
+        "24",
+        "25",
+        "26",
+        "35"
+      ],
+      "answer": "25",
+      "explain": "30减5等于25。"
+    },
+    {
+      "id": "ma028",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "45 - 28 = ?",
+      "read": "45减28等于几？",
+      "options": [
+        "16",
+        "17",
+        "18",
+        "19"
+      ],
+      "answer": "17",
+      "explain": "45减28等于17。"
+    },
+    {
+      "id": "ma029",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "3 × 4 = ?",
+      "read": "3乘4等于几？",
+      "options": [
+        "10",
+        "11",
+        "12",
+        "13"
+      ],
+      "answer": "12",
+      "explain": "三四十二，3乘4等于12。"
+    },
+    {
+      "id": "ma030",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "6 × 5 = ?",
+      "read": "6乘5等于几？",
+      "options": [
+        "25",
+        "30",
+        "35",
+        "40"
+      ],
+      "answer": "30",
+      "explain": "五六三十，6乘5等于30。"
+    },
+    {
+      "id": "en001",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "🍎 用英语怎么说？",
+      "read": "苹果用英语怎么说？",
+      "options": [
+        "apple",
+        "banana",
+        "pear",
+        "orange"
+      ],
+      "answer": "apple",
+      "explain": "apple 是“苹果”。"
+    },
+    {
+      "id": "en002",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "🐱 用英语怎么说？",
+      "read": "猫用英语怎么说？",
+      "options": [
+        "cat",
+        "dog",
+        "pig",
+        "duck"
+      ],
+      "answer": "cat",
+      "explain": "cat 是“猫”。"
+    },
+    {
+      "id": "en003",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "🐶 用英语怎么说？",
+      "read": "狗用英语怎么说？",
+      "options": [
+        "dog",
+        "cat",
+        "bird",
+        "fish"
+      ],
+      "answer": "dog",
+      "explain": "dog 是“狗”。"
+    },
+    {
+      "id": "en004",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "数字 3 的英文是？",
+      "read": "数字3的英文是什么？",
+      "options": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ],
+      "answer": "three",
+      "explain": "three 是“三”。"
+    },
+    {
+      "id": "en005",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "数字 5 的英文是？",
+      "read": "数字5的英文是什么？",
+      "options": [
+        "four",
+        "five",
+        "six",
+        "seven"
+      ],
+      "answer": "five",
+      "explain": "five 是“五”。"
+    },
+    {
+      "id": "en006",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "红色用英语怎么说？",
+      "read": "红色用英语怎么说？",
+      "options": [
+        "red",
+        "blue",
+        "green",
+        "yellow"
+      ],
+      "answer": "red",
+      "explain": "red 是“红色”。"
+    },
+    {
+      "id": "en007",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "蓝色用英语怎么说？",
+      "read": "蓝色用英语怎么说？",
+      "options": [
+        "red",
+        "blue",
+        "green",
+        "yellow"
+      ],
+      "answer": "blue",
+      "explain": "blue 是“蓝色”。"
+    },
+    {
+      "id": "en008",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "“你好”用英语怎么说？",
+      "read": "你好用英语怎么说？",
+      "options": [
+        "hello",
+        "goodbye",
+        "please",
+        "sorry"
+      ],
+      "answer": "hello",
+      "explain": "hello 是“你好”。"
+    },
+    {
+      "id": "en009",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "字母 b 的大写是？",
+      "read": "字母b的大写是什么？",
+      "options": [
+        "B",
+        "D",
+        "P",
+        "Q"
+      ],
+      "answer": "B",
+      "explain": "b 的大写是 B。"
+    },
+    {
+      "id": "en010",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "🍌 用英语怎么说？",
+      "read": "香蕉用英语怎么说？",
+      "options": [
+        "apple",
+        "banana",
+        "pear",
+        "grape"
+      ],
+      "answer": "banana",
+      "explain": "banana 是“香蕉”。"
+    },
+    {
+      "id": "en011",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "🐟 用英语怎么说？",
+      "read": "鱼用英语怎么说？",
+      "options": [
+        "fish",
+        "frog",
+        "bird",
+        "fox"
+      ],
+      "answer": "fish",
+      "explain": "fish 是“鱼”。"
+    },
+    {
+      "id": "en012",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "🐦 用英语怎么说？",
+      "read": "鸟用英语怎么说？",
+      "options": [
+        "bird",
+        "fish",
+        "cat",
+        "dog"
+      ],
+      "answer": "bird",
+      "explain": "bird 是“鸟”。"
+    },
+    {
+      "id": "en013",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "绿色用英语怎么说？",
+      "read": "绿色用英语怎么说？",
+      "options": [
+        "green",
+        "grey",
+        "blue",
+        "red"
+      ],
+      "answer": "green",
+      "explain": "green 是“绿色”。"
+    },
+    {
+      "id": "en014",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "黄色用英语怎么说？",
+      "read": "黄色用英语怎么说？",
+      "options": [
+        "yellow",
+        "red",
+        "orange",
+        "pink"
+      ],
+      "answer": "yellow",
+      "explain": "yellow 是“黄色”。"
+    },
+    {
+      "id": "en015",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "“谢谢”用英语怎么说？",
+      "read": "谢谢用英语怎么说？",
+      "options": [
+        "thank you",
+        "sorry",
+        "hello",
+        "goodbye"
+      ],
+      "answer": "thank you",
+      "explain": "thank you 是“谢谢”。"
+    },
+    {
+      "id": "en016",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "数字 8 的英文是？",
+      "read": "数字8的英文是什么？",
+      "options": [
+        "six",
+        "seven",
+        "eight",
+        "nine"
+      ],
+      "answer": "eight",
+      "explain": "eight 是“八”。"
+    },
+    {
+      "id": "en017",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "数字 10 的英文是？",
+      "read": "数字10的英文是什么？",
+      "options": [
+        "nine",
+        "ten",
+        "eleven",
+        "twelve"
+      ],
+      "answer": "ten",
+      "explain": "ten 是“十”。"
+    },
+    {
+      "id": "en018",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "🐷 用英语怎么说？",
+      "read": "猪用英语怎么说？",
+      "options": [
+        "pig",
+        "cow",
+        "duck",
+        "sheep"
+      ],
+      "answer": "pig",
+      "explain": "pig 是“猪”。"
+    },
+    {
+      "id": "en019",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "🐮 用英语怎么说？",
+      "read": "奶牛用英语怎么说？",
+      "options": [
+        "cow",
+        "pig",
+        "horse",
+        "duck"
+      ],
+      "answer": "cow",
+      "explain": "cow 是“奶牛、牛”。"
+    },
+    {
+      "id": "en020",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "字母 d 的大写是？",
+      "read": "字母d的大写是什么？",
+      "options": [
+        "D",
+        "B",
+        "P",
+        "Q"
+      ],
+      "answer": "D",
+      "explain": "d 的大写是 D。"
+    },
+    {
+      "id": "en021",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“apple”的第一个字母是？",
+      "read": "apple的第一个字母是什么？",
+      "options": [
+        "a",
+        "b",
+        "p",
+        "e"
+      ],
+      "answer": "a",
+      "explain": "apple 以字母 a 开头。"
+    },
+    {
+      "id": "en022",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“banana”有几个字母？",
+      "read": "banana有几个字母？",
+      "options": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "answer": "6",
+      "explain": "b-a-n-a-n-a，一共6个字母。"
+    },
+    {
+      "id": "en023",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“妈妈”用英语怎么说？",
+      "read": "妈妈用英语怎么说？",
+      "options": [
+        "mother",
+        "father",
+        "sister",
+        "brother"
+      ],
+      "answer": "mother",
+      "explain": "mother 是“妈妈”。"
+    },
+    {
+      "id": "en024",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“爸爸”用英语怎么说？",
+      "read": "爸爸用英语怎么说？",
+      "options": [
+        "mother",
+        "father",
+        "teacher",
+        "doctor"
+      ],
+      "answer": "father",
+      "explain": "father 是“爸爸”。"
+    },
+    {
+      "id": "en025",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "🍇 用英语怎么说？",
+      "read": "葡萄用英语怎么说？",
+      "options": [
+        "grape",
+        "pear",
+        "orange",
+        "lemon"
+      ],
+      "answer": "grape",
+      "explain": "grape 是“葡萄”。"
+    },
+    {
+      "id": "en026",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“Good morning”是什么意思？",
+      "read": "Good morning是什么意思？",
+      "options": [
+        "早上好",
+        "晚上好",
+        "再见",
+        "谢谢"
+      ],
+      "answer": "早上好",
+      "explain": "Good morning 是“早上好”。"
+    },
+    {
+      "id": "en027",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "字母表中，B 后面的字母是？",
+      "read": "字母表中，B后面的字母是什么？",
+      "options": [
+        "A",
+        "C",
+        "D",
+        "E"
+      ],
+      "answer": "C",
+      "explain": "字母顺序是 A、B、C、D……"
+    },
+    {
+      "id": "en028",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "字母表中，Y 后面的字母是？",
+      "read": "字母表中，Y后面的字母是什么？",
+      "options": [
+        "W",
+        "X",
+        "Z",
+        "Q"
+      ],
+      "answer": "Z",
+      "explain": "Y 后面是 Z，字母表就学完了。"
+    },
+    {
+      "id": "en029",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“I am a boy”是什么意思？",
+      "read": "I am a boy是什么意思？",
+      "options": [
+        "我是一个男孩",
+        "我是一个女孩",
+        "我有一只猫",
+        "我喜欢苹果"
+      ],
+      "answer": "我是一个男孩",
+      "explain": "I am a boy 意思是“我是一个男孩”。"
+    },
+    {
+      "id": "en030",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“red”和“green”分别是什么意思？",
+      "read": "red和green分别是什么意思？",
+      "options": [
+        "红色和绿色",
+        "蓝色和黄色",
+        "黑色和白色",
+        "粉色和紫色"
+      ],
+      "answer": "红色和绿色",
+      "explain": "red 是红色，green 是绿色。"
+    },
+    {
+      "id": "cn031",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「mǎ」是第几声？",
+      "read": "mǎ是第几声？",
+      "options": [
+        "第一声",
+        "第二声",
+        "第三声",
+        "第四声"
+      ],
+      "answer": "第三声",
+      "explain": "mǎ 是第三声，读的时候先降后升，比如「马」。"
+    },
+    {
+      "id": "cn032",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「bà」是第几声？",
+      "read": "bà是第几声？",
+      "options": [
+        "第一声",
+        "第二声",
+        "第三声",
+        "第四声"
+      ],
+      "answer": "第四声",
+      "explain": "bà 是第四声，读的时候向下落，比如「爸」。"
+    },
+    {
+      "id": "cn033",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「bā」是第几声？",
+      "read": "bā是第几声？",
+      "options": [
+        "第一声",
+        "第二声",
+        "第三声",
+        "第四声"
+      ],
+      "answer": "第一声",
+      "explain": "bā 是第一声，读音平直，比如「八」。"
+    },
+    {
+      "id": "cn034",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「má」是第几声？",
+      "read": "má是第几声？",
+      "options": [
+        "第一声",
+        "第二声",
+        "第三声",
+        "第四声"
+      ],
+      "answer": "第二声",
+      "explain": "má 是第二声，读音向上扬，比如「麻」。"
+    },
+    {
+      "id": "cn035",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "下面哪个读第三声？",
+      "read": "下面哪个读第三声？",
+      "options": [
+        "mā",
+        "má",
+        "mǎ",
+        "mà"
+      ],
+      "answer": "mǎ",
+      "explain": "mǎ 是第三声，先降后升。"
+    },
+    {
+      "id": "cn036",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「妈」的拼音是？",
+      "read": "妈的拼音是什么？",
+      "options": [
+        "mā",
+        "má",
+        "mǎ",
+        "mà"
+      ],
+      "answer": "mā",
+      "explain": "妈 读 mā，第一声。"
+    },
+    {
+      "id": "cn037",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「马」的拼音是？",
+      "read": "马的拼音是什么？",
+      "options": [
+        "mā",
+        "má",
+        "mǎ",
+        "mà"
+      ],
+      "answer": "mǎ",
+      "explain": "马 读 mǎ，第三声。"
+    },
+    {
+      "id": "cn038",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「麻」的拼音是？",
+      "read": "麻的拼音是什么？",
+      "options": [
+        "mā",
+        "má",
+        "mǎ",
+        "mà"
+      ],
+      "answer": "má",
+      "explain": "麻 读 má，第二声。"
+    },
+    {
+      "id": "cn039",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「iu」的声调标在哪个字母上？",
+      "read": "iu的声调标在哪个字母上？",
+      "options": [
+        "u",
+        "i",
+        "都不标",
+        "随便标"
+      ],
+      "answer": "u",
+      "explain": "iu 的声调标在后面的字母 u 上，比如 liù。"
+    },
+    {
+      "id": "cn040",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「ie」的声调标在哪个字母上？",
+      "read": "ie的声调标在哪个字母上？",
+      "options": [
+        "e",
+        "i",
+        "都不标",
+        "随便标"
+      ],
+      "answer": "e",
+      "explain": "ie 的声调标在后面的字母 e 上，比如 xiě。"
+    },
+    {
+      "id": "cn041",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "下面哪个词是正确的？",
+      "read": "下面哪个词是正确的？",
+      "options": [
+        "苹果",
+        "苹里",
+        "平果",
+        "萍果"
+      ],
+      "answer": "苹果",
+      "explain": "正确写法是「苹果」。"
+    },
+    {
+      "id": "cn042",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「河」字的偏旁是？",
+      "read": "河字的偏旁是什么？",
+      "options": [
+        "氵",
+        "口",
+        "可",
+        "木"
+      ],
+      "answer": "氵",
+      "explain": "「河」是三点水旁，和水有关。"
+    },
+    {
+      "id": "cn043",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「树」字是什么结构？",
+      "read": "树字是什么结构？",
+      "options": [
+        "左右结构",
+        "上下结构",
+        "半包围结构",
+        "全包围结构"
+      ],
+      "answer": "左右结构",
+      "explain": "「树」左边是「木」，右边是「对」，是左右结构。"
+    },
+    {
+      "id": "cn044",
+      "subject": "chinese",
+      "difficulty": 2,
+      "question": "「国」字是什么结构？",
+      "read": "国字是什么结构？",
+      "options": [
+        "全包围结构",
+        "左右结构",
+        "上下结构",
+        "半包围结构"
+      ],
+      "answer": "全包围结构",
+      "explain": "「国」外面是「囗」，是全包围结构。"
+    },
+    {
+      "id": "cn045",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "下面哪个字是「入」？",
+      "read": "下面哪个字是入？",
+      "options": [
+        "入",
+        "人",
+        "八",
+        "又"
+      ],
+      "answer": "入",
+      "explain": "「入」的撇短、捺长，和「人」不一样。"
+    },
+    {
+      "id": "cn046",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「大」字有几画？",
+      "read": "大字有几画？",
+      "options": [
+        "3画",
+        "2画",
+        "4画",
+        "5画"
+      ],
+      "answer": "3画",
+      "explain": "「大」一共 3 画：横、撇、捺。"
+    },
+    {
+      "id": "cn047",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「水」字有几画？",
+      "read": "水字有几画？",
+      "options": [
+        "4画",
+        "3画",
+        "5画",
+        "6画"
+      ],
+      "answer": "4画",
+      "explain": "「水」一共 4 画。"
+    },
+    {
+      "id": "cn048",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「安静」的反义词是？",
+      "read": "安静的反义词是什么？",
+      "options": [
+        "吵闹",
+        "安静",
+        "高兴",
+        "快乐"
+      ],
+      "answer": "吵闹",
+      "explain": "安静和吵闹意思相反。"
+    },
+    {
+      "id": "cn049",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「日」和「目」的区别是？",
+      "read": "日和目的区别是什么？",
+      "options": [
+        "「日」里一横，「目」里两横",
+        "两个字完全一样",
+        "「目」比「日」少一横",
+        "「日」比「目」多两横"
+      ],
+      "answer": "「日」里一横，「目」里两横",
+      "explain": "「日」中间一横，「目」里面两横。"
+    },
+    {
+      "id": "cn050",
+      "subject": "chinese",
+      "difficulty": 3,
+      "question": "「他」「她」「它」分别指什么？",
+      "read": "他她它分别指什么？",
+      "options": [
+        "男生、女生、动物或东西",
+        "女生、男生、动物",
+        "动物、男生、女生",
+        "三个字意思一样"
+      ],
+      "answer": "男生、女生、动物或东西",
+      "explain": "「他」指男生，「她」指女生，「它」指动物或东西。"
+    },
+    {
+      "id": "en031",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "apple",
+        "banana",
+        "orange",
+        "pear"
+      ],
+      "answer": "apple",
+      "explain": "apple 是「苹果」。",
+      "listen": "apple"
+    },
+    {
+      "id": "en032",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "dog",
+        "cat",
+        "pig",
+        "duck"
+      ],
+      "answer": "dog",
+      "explain": "dog 是「狗」。",
+      "listen": "dog"
+    },
+    {
+      "id": "en033",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "one",
+        "three",
+        "five",
+        "nine"
+      ],
+      "answer": "three",
+      "explain": "three 是「三」。",
+      "listen": "three"
+    },
+    {
+      "id": "en034",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "red",
+        "green",
+        "blue",
+        "yellow"
+      ],
+      "answer": "red",
+      "explain": "red 是「红色」。",
+      "listen": "red"
+    },
+    {
+      "id": "en035",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "mother",
+        "father",
+        "sister",
+        "brother"
+      ],
+      "answer": "mother",
+      "explain": "mother 是「妈妈」。",
+      "listen": "mother"
+    },
+    {
+      "id": "en036",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "banana",
+        "apple",
+        "pear",
+        "grape"
+      ],
+      "answer": "banana",
+      "explain": "banana 是「香蕉」。",
+      "listen": "banana"
+    },
+    {
+      "id": "en037",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "school",
+        "home",
+        "park",
+        "shop"
+      ],
+      "answer": "school",
+      "explain": "school 是「学校」。",
+      "listen": "school"
+    },
+    {
+      "id": "en038",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出它的意思",
+      "read": "听一听，选出它的意思",
+      "options": [
+        "苹果",
+        "香蕉",
+        "橘子",
+        "梨"
+      ],
+      "answer": "苹果",
+      "explain": "apple 的意思是「苹果」。",
+      "listen": "apple"
+    },
+    {
+      "id": "en039",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出它的意思",
+      "read": "听一听，选出它的意思",
+      "options": [
+        "水",
+        "牛奶",
+        "果汁",
+        "茶"
+      ],
+      "answer": "水",
+      "explain": "water 的意思是「水」。",
+      "listen": "water"
+    },
+    {
+      "id": "en040",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出它的意思",
+      "read": "听一听，选出它的意思",
+      "options": [
+        "书",
+        "笔",
+        "包",
+        "尺子"
+      ],
+      "answer": "书",
+      "explain": "book 的意思是「书」。",
+      "listen": "book"
+    },
+    {
+      "id": "en041",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出你听到的字母",
+      "read": "听一听，选出你听到的字母",
+      "options": [
+        "B",
+        "V",
+        "D",
+        "P"
+      ],
+      "answer": "B",
+      "explain": "听到的是字母 B。",
+      "listen": "B"
+    },
+    {
+      "id": "en042",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出你听到的字母",
+      "read": "听一听，选出你听到的字母",
+      "options": [
+        "K",
+        "J",
+        "Q",
+        "G"
+      ],
+      "answer": "K",
+      "explain": "听到的是字母 K。",
+      "listen": "K"
+    },
+    {
+      "id": "en043",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出你听到的单词",
+      "read": "听一听，选出你听到的单词",
+      "options": [
+        "six",
+        "eight",
+        "ten",
+        "twelve"
+      ],
+      "answer": "eight",
+      "explain": "eight 是「八」。",
+      "listen": "eight"
+    },
+    {
+      "id": "en044",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "听一听，选出它的意思",
+      "read": "听一听，选出它的意思",
+      "options": [
+        "高兴的",
+        "难过的",
+        "生气的",
+        "累的"
+      ],
+      "answer": "高兴的",
+      "explain": "happy 的意思是「高兴的」。",
+      "listen": "happy"
+    },
+    {
+      "id": "ma031",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "7 × 8 = ?",
+      "read": "7乘8等于几？",
+      "options": [
+        "54",
+        "56",
+        "58",
+        "64"
+      ],
+      "answer": "56",
+      "explain": "七八五十六，7乘8等于56。"
+    },
+    {
+      "id": "ma032",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "9 × 6 = ?",
+      "read": "9乘6等于几？",
+      "options": [
+        "45",
+        "54",
+        "56",
+        "63"
+      ],
+      "answer": "54",
+      "explain": "六九五十四，9乘6等于54。"
+    },
+    {
+      "id": "ma033",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "小明有 15 颗糖，吃了 7 颗，还剩几颗？",
+      "read": "小明有15颗糖，吃了7颗，还剩几颗？",
+      "options": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "answer": "8",
+      "explain": "15 减 7 等于 8。"
+    },
+    {
+      "id": "ma034",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "每盒有 6 支笔，4 盒一共几支？",
+      "read": "每盒有6支笔，4盒一共几支？",
+      "options": [
+        "18",
+        "20",
+        "24",
+        "28"
+      ],
+      "answer": "24",
+      "explain": "4 个 6 相加，6×4＝24。"
+    },
+    {
+      "id": "ma035",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "1 小时 = 多少分钟？",
+      "read": "1小时等于多少分钟？",
+      "options": [
+        "30",
+        "45",
+        "60",
+        "100"
+      ],
+      "answer": "60",
+      "explain": "1 小时 = 60 分钟。"
+    },
+    {
+      "id": "ma036",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "1 元 = 多少角？",
+      "read": "1元等于多少角？",
+      "options": [
+        "5",
+        "10",
+        "100",
+        "50"
+      ],
+      "answer": "10",
+      "explain": "1 元 = 10 角。"
+    },
+    {
+      "id": "ma037",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "找规律：1、4、9、16、( )",
+      "read": "找规律，1、4、9、16，下一个是几？",
+      "options": [
+        "20",
+        "24",
+        "25",
+        "36"
+      ],
+      "answer": "25",
+      "explain": "分别是 1×1、2×2、3×3、4×4，下一个是 5×5＝25。"
+    },
+    {
+      "id": "ma038",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "6 × 6 = ?",
+      "read": "6乘6等于几？",
+      "options": [
+        "30",
+        "32",
+        "36",
+        "42"
+      ],
+      "answer": "36",
+      "explain": "六六三十六，6乘6等于36。"
+    },
+    {
+      "id": "ma039",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "妈妈买了 3 千克苹果，吃掉 1 千克，还剩几千克？",
+      "read": "妈妈买了3千克苹果，吃掉1千克，还剩几千克？",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": "2",
+      "explain": "3 减 1 等于 2（千克）。"
+    },
+    {
+      "id": "ma040",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "8 × 9 = ?",
+      "read": "8乘9等于几？",
+      "options": [
+        "63",
+        "72",
+        "81",
+        "64"
+      ],
+      "answer": "72",
+      "explain": "八九七十二，8乘9等于72。"
+    }
+  ]
+};
+/* BANK_END */
+
+/* ---------------- 科目配置 ---------------- */
+const SUBJECTS = [
+  { key: 'chinese', name: '语文', emoji: '📖', pill: 'pill-cn' },
+  { key: 'math', name: '数学', emoji: '🔢', pill: 'pill-math' },
+  { key: 'english', name: '英语', emoji: '🅰️', pill: 'pill-en' }
+];
+const QPS = 10; // 每科题数
+const REVIEW = {
+  chinese: '拼音、反义词、量词与古诗',
+  math: '加减法、比较大小与找规律',
+  english: '单词、字母与日常用语'
+};
+
+/* ---------------- 全局状态 ---------------- */
+const state = {
+  level: clamp(store.get('kkg2_level', 1), 1, 999),
+  stars: store.get('kkg2_stars', 0),
+  soundOn: store.get('kkg2_sound', true),
+  stats: store.get('kkg2_stats', {}),
+  screen: 'home',
+  block: 0, blockQ: 0, blockCorrect: 0, blockEarned: 0,
+  levelCorrect: 0, levelTotal: 0, levelEarned: 0,
+  questions: [], lastIds: [], answered: false,
+  game: null
+};
+
+/* ---------------- 音效 ---------------- */
+let actx = null;
+function ensureAudio() {
+  if (!actx) {
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch (e) { actx = null; }
+  }
+  if (actx && actx.state === 'suspended') { actx.resume().catch(function () {}); }
+}
+function tone(freq, dur, type, vol, delay) {
+  if (!state.soundOn || !actx) return;
+  dur = dur || 0.12; type = type || 'sine'; vol = vol || 0.12; delay = delay || 0;
+  try {
+    const t0 = actx.currentTime + delay;
+    const osc = actx.createOscillator();
+    const g = actx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g);
+    g.connect(actx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.03);
+  } catch (e) {}
+}
+const sfx = {
+  correct() { tone(660, 0.1); tone(880, 0.14, 'sine', 0.12, 0.1); tone(1100, 0.16, 'sine', 0.1, 0.2); },
+  wrong() { tone(200, 0.2, 'sawtooth', 0.09); tone(150, 0.22, 'sawtooth', 0.08, 0.12); },
+  pop() { tone(520, 0.06, 'triangle', 0.18); },
+  win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, 'sine', 0.12, i * 0.13)); }
+};
+
+/* ---------------- 语音朗读 ---------------- */
+function speakAs(text, lang, rate) {
+  if (!state.soundOn || !('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = lang || 'zh-CN';
+    u.rate = rate || 0.95;
+    u.pitch = 1.05;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+function speak(text) { speakAs(text, 'zh-CN', 0.95); }
+function speakEn(text) { speakAs(text, 'en-US', 0.8); }
+
+/* =========================================================
+ *  自适应出题引擎
+ *  - 每道题记录：出现次数 s / 答对次数 c / 答错次数 w
+ *  - 权重：答错越多权重越高（下次更容易出现），答对越多权重越低
+ *  - 难度：随着关卡和正确率变化，目标难度 1~3 慢慢提升
+ * ========================================================= */
+function questionsOf(subject) {
+  return QUESTION_BANK.questions.filter((q) => q.subject === subject);
+}
+function subjectStats(subject) {
+  let seen = 0, correct = 0;
+  questionsOf(subject).forEach((q) => {
+    const st = state.stats[q.id];
+    if (st) { seen += st.s || 0; correct += st.c || 0; }
+  });
+  return { seen: seen, correct: correct, acc: seen ? correct / seen : 0.7 };
+}
+function subjectTarget(subject) {
+  let target = 1 + Math.floor((state.level - 1) / 2);
+  const st = subjectStats(subject);
+  if (st.seen >= 6) {
+    if (st.acc >= 0.85) target += 1;
+    else if (st.acc < 0.5) target -= 1;
+  }
+  return clamp(target, 1, 3);
+}
+function weightOf(q) {
+  const st = state.stats[q.id];
+  if (!st) return 2.2; // 没做过的题优先出现
+  return Math.max(0.25, 1 + 2 * (st.w || 0) - 0.6 * (st.c || 0));
+}
+function pickQuestion(subject) {
+  const target = subjectTarget(subject);
+  const pool = questionsOf(subject);
+  const avoid = new Set(state.lastIds);
+  let cand = pool.filter((q) => !avoid.has(q.id) && Math.abs(q.difficulty - target) <= 1);
+  if (cand.length < 3) cand = pool.filter((q) => !avoid.has(q.id));
+  if (cand.length === 0) cand = pool;
+  const weights = cand.map((q) => {
+    const dist = Math.abs(q.difficulty - target);
+    const bonus = dist === 0 ? 1.9 : (dist === 1 ? 1.0 : 0.7);
+    return weightOf(q) * bonus;
+  });
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < cand.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return cand[i];
+  }
+  return cand[cand.length - 1];
+}
+function pickBlock(subject, count) {
+  const res = [];
+  let guard = 0;
+  while (res.length < count && guard < 300) {
+    guard++;
+    const q = pickQuestion(subject);
+    if (!res.some((x) => x.id === q.id)) res.push(q);
+  }
+  return res;
+}
+
+/* =========================================================
+ *  屏幕切换 / 状态栏
+ * ========================================================= */
+function updateHUD() {
+  $('#hudStars').textContent = state.stars;
+  $('#hudLevel').textContent = '第 ' + state.level + ' 关';
+  $('#hudSound').textContent = state.soundOn ? '🔊' : '🔇';
+}
+function showScreen(name) {
+  state.screen = name;
+  $$('.screen').forEach((s) => s.classList.toggle('active', s.id === 'screen-' + name));
+  updateHUD();
+}
+function renderHome() {
+  $('#homeInfo').innerHTML =
+    '当前进度：第 <b>' + state.level + '</b> 关 · 已收集 <b>' + state.stars + '</b> ⭐<br>' +
+    '每关：语文 10 题 → 数学 10 题 → 英语 10 题';
+}
+
+/* =========================================================
+ *  答题流程
+ * ========================================================= */
+function startLevel(level) {
+  ensureAudio();
+  state.level = clamp(level, 1, 999);
+  store.set('kkg2_level', state.level);
+  state.block = 0;
+  state.levelCorrect = 0;
+  state.levelTotal = 0;
+  state.levelEarned = 0;
+  startBlock();
+}
+function startBlock() {
+  const subj = SUBJECTS[state.block];
+  state.questions = pickBlock(subj.key, QPS);
+  state.blockQ = 0;
+  state.blockCorrect = 0;
+  state.blockEarned = 0;
+  showScreen('quiz');
+  renderQuestion();
+}
+function renderQuestion() {
+  const q = state.questions[state.blockQ];
+  const subj = SUBJECTS[state.block];
+  state.answered = false;
+
+  state.lastIds.push(q.id);
+  if (state.lastIds.length > 5) state.lastIds.shift();
+
+  $('#quizSubject').textContent = subj.emoji + ' ' + subj.name;
+  $('#quizSubject').className = 'pill ' + subj.pill;
+  $('#quizQNum').textContent = '第 ' + (state.blockQ + 1) + ' / ' + QPS + ' 题';
+  $('#quizDiff').textContent = '难度 ' + '★'.repeat(q.difficulty) + '☆'.repeat(3 - q.difficulty);
+  $('#quizProgress').innerHTML = '';
+  for (let i = 0; i < QPS; i++) {
+    const d = document.createElement('span');
+    d.className = 'dot' + (i < state.blockQ ? ' done' : '') + (i === state.blockQ ? ' cur' : '');
+    $('#quizProgress').appendChild(d);
+  }
+  $('#quizQuestion').textContent = q.question;
+
+  const opts = $('#quizOptions');
+  opts.innerHTML = '';
+  shuffle(q.options).forEach((text) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = text;
+    b.addEventListener('click', () => answerQuestion(b, text));
+    opts.appendChild(b);
+  });
+
+  const tip = $('#quizTip');
+  tip.classList.remove('show');
+  tip.textContent = '';
+  $('#quizNext').classList.add('hidden');
+
+  const listenBtn = $('#quizListen');
+  if (q.listen) {
+    listenBtn.classList.remove('hidden');
+    setTimeout(() => speakEn(q.listen), 420);
+  } else {
+    listenBtn.classList.add('hidden');
+    setTimeout(() => speak('第' + (state.blockQ + 1) + '题。' + (q.read || q.question)), 380);
+  }
+}
+function answerQuestion(btn, text) {
+  if (state.answered) return;
+  state.answered = true;
+  const q = state.questions[state.blockQ];
+  const ok = text === q.answer;
+  const st = state.stats[q.id] || (state.stats[q.id] = { s: 0, c: 0, w: 0 });
+  st.s++;
+  if (ok) st.c++; else st.w++;
+  store.set('kkg2_stats', state.stats);
+
+  $$('#quizOptions .opt').forEach((b) => {
+    b.disabled = true;
+    if (b.textContent === q.answer) b.classList.add('correct');
+  });
+
+  state.levelTotal++;
+  if (ok) {
+    sfx.correct();
+    state.blockCorrect++;
+    state.levelCorrect++;
+    state.stars++;
+    state.blockEarned++;
+    state.levelEarned++;
+    store.set('kkg2_stars', state.stars);
+    updateHUD();
+    speak('答对啦！' + q.explain);
+  } else {
+    btn.classList.add('wrong');
+    sfx.wrong();
+    speak('再想一想。' + q.explain);
+  }
+
+  const tip = $('#quizTip');
+  tip.textContent = (ok ? '✅ 答对啦！' : '💡 正确答案是「' + q.answer + '」 ') + q.explain +
+    (ok ? '' : ' 别急，这道题以后会多出现几次帮你记住～');
+  tip.classList.add('show');
+
+  const next = $('#quizNext');
+  next.classList.remove('hidden');
+  next.textContent = state.blockQ >= QPS - 1 ? '🎮 去玩小游戏' : '下一题 ➜';
+  next.onclick = () => {
+    if (state.blockQ >= QPS - 1) {
+      startMiniGame();
+    } else {
+      state.blockQ++;
+      renderQuestion();
+    }
+  };
+}
+
+/* =========================================================
+ *  知识泡泡小游戏（每科 10 题后玩一次）
+ *  题目来自该科题库（同样受自适应影响），点对答案得分
+ * ========================================================= */
+const HEARTS_MAX = 3;
+const GAME_TIME = 30;
+const BUBBLE_COLORS = ['#4F7CFF', '#FF9A3C', '#9B7BFF', '#3ECF8E', '#FF6B9D', '#38BDF8'];
+
+function startMiniGame() {
+  const subj = SUBJECTS[state.block];
+  state.game = {
+    type: subj.key, name: subj.name,
+    score: 0, hearts: HEARTS_MAX, time: GAME_TIME,
+    target: null, options: [], bubbles: [],
+    rafId: null, tickId: null, spawnId: null,
+    over: false, lastTs: 0
+  };
+  const g = state.game;
+  $('#gameScore').textContent = '0';
+  renderHearts();
+  updateTimerBar();
+  showScreen('game');
+  nextTarget();
+  g.lastTs = performance.now();
+  g.tickId = setInterval(gameTick, 1000);
+  g.rafId = requestAnimationFrame(moveLoop);
+  g.spawnId = setInterval(spawnBubble, 950);
+  setTimeout(spawnBubble, 250);
+  setTimeout(spawnBubble, 600);
+}
+function stopMiniGame() {
+  const g = state.game;
+  if (!g) return;
+  g.over = true;
+  if (g.tickId) clearInterval(g.tickId);
+  if (g.spawnId) clearInterval(g.spawnId);
+  if (g.rafId) cancelAnimationFrame(g.rafId);
+  g.bubbles.forEach((b) => { try { b.el.remove(); } catch (e) {} });
+  state.game = null;
+  try { speechSynthesis.cancel(); } catch (e) {}
+  $('#bubbleArea').innerHTML = '';
+}
+function nextTarget() {
+  const g = state.game;
+  if (!g || g.over) return;
+  let q = pickQuestion(g.type);
+  let guard = 0;
+  while (q.listen && guard < 12) { q = pickQuestion(g.type); guard++; }
+  g.target = q;
+  g.options = q.options.map(String);
+  $('#gamePrompt').textContent = g.name + ' · 找出正确答案';
+  const t = $('#gameTarget');
+  t.textContent = q.question;
+  t.classList.toggle('long', q.question.length > 9);
+  speak(q.read || q.question);
+}
+function renderHearts() {
+  const g = state.game;
+  if (!g) return;
+  const h = Math.max(0, g.hearts);
+  $('#gameHearts').textContent = '❤️'.repeat(h) + '🤍'.repeat(HEARTS_MAX - h);
+}
+function updateTimerBar() {
+  const g = state.game;
+  if (!g) return;
+  const fill = $('#timerFill');
+  fill.style.width = Math.max(0, (g.time / GAME_TIME) * 100) + '%';
+  fill.classList.toggle('low', g.time <= 8);
+}
+function gameTick() {
+  const g = state.game;
+  if (!g || g.over) return;
+  g.time--;
+  updateTimerBar();
+  if (g.time <= 0) endMiniGame();
+}
+function bubbleFontSize(size, value) {
+  const len = Math.max(1, String(value).length);
+  const hasCjk = /[\u4e00-\u9fff]/.test(String(value));
+  const maxByLen = hasCjk ? (size * 0.82 / len) : (size * 1.7 / len);
+  return Math.max(12, Math.min(size * 0.33, maxByLen));
+}
+function spawnBubble() {
+  const g = state.game;
+  if (!g || g.over || state.screen !== 'game') return;
+  const area = $('#bubbleArea');
+  if (!area || area.clientWidth === 0) return;
+  if (g.bubbles.length >= 7) return;
+  const aw = area.clientWidth;
+  const ah = area.clientHeight;
+  const size = clamp(Math.round(aw * 0.16), 64, 140);
+  /* 提高正确答案出现的概率，方便小朋友找到目标 */
+  const value = Math.random() < 0.5 ? String(g.target.answer) : pick(g.options);
+  const el = document.createElement('div');
+  el.className = 'bubble';
+  el.style.width = size + 'px';
+  el.style.height = size + 'px';
+  el.style.fontSize = Math.round(bubbleFontSize(size, value)) + 'px';
+  el.style.background = BUBBLE_COLORS[randInt(0, BUBBLE_COLORS.length - 1)];
+  el.textContent = value;
+  const x = rand(10, Math.max(11, aw - size - 10));
+  const b = { el: el, x: x, y: ah + size, vy: rand(60, 92) + g.score * 3, value: String(value), dead: false };
+  el.style.left = b.x + 'px';
+  el.style.top = b.y + 'px';
+  el.addEventListener('pointerdown', (ev) => { ev.preventDefault(); tapBubble(b); });
+  area.appendChild(el);
+  g.bubbles.push(b);
+}
+function tapBubble(b) {
+  const g = state.game;
+  if (!g || g.over || b.dead) return;
+  if (b.value === String(g.target.answer)) {
+    b.dead = true;
+    sfx.pop();
+    b.el.classList.add('pop');
+    setTimeout(() => { try { b.el.remove(); } catch (e) {} }, 280);
+    g.score++;
+    state.stars++;
+    state.blockEarned++;
+    state.levelEarned++;
+    store.set('kkg2_stars', state.stars);
+    $('#gameScore').textContent = g.score;
+    updateHUD();
+    floatStar(b.x + 18, b.y);
+    if (g.type === 'math') speak((g.target.read || g.target.question) + ' 等于 ' + g.target.answer);
+    else speak('真棒！');
+    g.bubbles.forEach((o) => {
+      if (o !== b && !o.dead) {
+        o.dead = true;
+        o.el.classList.add('fade');
+        setTimeout(() => { try { o.el.remove(); } catch (e) {} }, 240);
+      }
+    });
+    g.bubbles = [];
+    setTimeout(() => { if (state.game === g && !g.over) nextTarget(); }, 160);
+  } else {
+    sfx.wrong();
+    b.el.classList.add('shake');
+    setTimeout(() => { try { b.el.classList.remove('shake'); } catch (e) {} }, 440);
+    g.hearts--;
+    renderHearts();
+    if (g.hearts <= 0) endMiniGame();
+  }
+}
+function floatStar(x, y) {
+  const area = $('#bubbleArea');
+  if (!area) return;
+  const s = document.createElement('span');
+  s.className = 'float-star';
+  s.textContent = '+1 ⭐';
+  s.style.left = x + 'px';
+  s.style.top = y + 'px';
+  area.appendChild(s);
+  setTimeout(() => { try { s.remove(); } catch (e) {} }, 720);
+}
+function moveLoop(ts) {
+  const g = state.game;
+  if (!g || g.over || state.screen !== 'game') return;
+  const dt = Math.min(Math.max((ts - g.lastTs) / 1000, 0), 0.1);
+  g.lastTs = ts;
+  for (let i = 0; i < g.bubbles.length; i++) {
+    const b = g.bubbles[i];
+    if (b.dead) continue;
+    b.y -= b.vy * dt;
+    if (b.y < -220) {
+      b.dead = true;
+      try { b.el.remove(); } catch (e) {}
+      continue;
+    }
+    b.el.style.top = b.y + 'px';
+  }
+  g.bubbles = g.bubbles.filter((b) => !b.dead);
+  g.rafId = requestAnimationFrame(moveLoop);
+}
+function endMiniGame() {
+  const g = state.game;
+  if (!g || g.over) return;
+  g.over = true;
+  if (g.tickId) clearInterval(g.tickId);
+  if (g.spawnId) clearInterval(g.spawnId);
+  if (g.rafId) cancelAnimationFrame(g.rafId);
+  sfx.win();
+  showBlockResult();
+}
+
+/* =========================================================
+ *  结算
+ * ========================================================= */
+function showBlockResult() {
+  const subj = SUBJECTS[state.block];
+  const g = state.game;
+  const isLast = state.block >= 2;
+  if (isLast) {
+    store.set('kkg2_level', state.level + 1);
+    confetti();
+  }
+  showScreen('result');
+  $('#resultEmoji').textContent = isLast ? '🎉' : subj.emoji;
+  $('#resultTitle').textContent = isLast ? '第 ' + state.level + ' 关完成！' : subj.name + '完成！';
+  $('#resultStars').textContent = '+' + state.blockEarned + ' ⭐';
+  $('#resultDetail').innerHTML =
+    subj.name + '答对 <b>' + state.blockCorrect + '</b> / ' + QPS + ' 题 · 小游戏得分 <b>' + (g ? g.score : 0) + '</b><br>' +
+    (isLast
+      ? '本关共答对 <b>' + state.levelCorrect + '</b> / ' + state.levelTotal + ' 题'
+      : '累计星星：<b>' + state.stars + '</b> ⭐');
+  $('#resultReview').textContent = '📚 知识回顾：' + (REVIEW[subj.key] || '');
+  speak(isLast ? ('第' + state.level + '关完成！') : (subj.name + '完成！'));
+  renderResultButtons(isLast);
+}
+function renderResultButtons(isLast) {
+  const btns = $('#resultButtons');
+  btns.innerHTML = '';
+  if (!isLast) {
+    addResultBtn(btns, '➡️ 继续' + SUBJECTS[state.block + 1].name, 'btn primary', () => {
+      state.block++;
+      startBlock();
+    });
+  } else {
+    addResultBtn(btns, '➡️ 下一关', 'btn primary', () => startLevel(state.level + 1));
+    addResultBtn(btns, '🔁 再玩一次', 'btn ghost', () => startLevel(state.level));
+  }
+  addResultBtn(btns, '🏠 回首页', 'btn ghost', goHome);
+}
+function addResultBtn(parent, text, cls, fn) {
+  const b = document.createElement('button');
+  b.className = cls;
+  b.textContent = text;
+  b.addEventListener('click', () => { ensureAudio(); fn(); });
+  parent.appendChild(b);
+}
+function goHome() {
+  if (state.game) stopMiniGame();
+  state.level = clamp(store.get('kkg2_level', 1), 1, 999);
+  renderHome();
+  showScreen('home');
+}
+
+/* =========================================================
+ *  彩带 & 提示
+ * ========================================================= */
+function confetti() {
+  const colors = ['#FF6B6B', '#FFD93D', '#3ECF8E', '#4F7CFF', '#9B7BFF', '#FF9A3C'];
+  for (let i = 0; i < 48; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = rand(0, 100) + 'vw';
+    c.style.background = colors[randInt(0, colors.length - 1)];
+    c.style.animationDuration = rand(2.2, 3.6) + 's';
+    c.style.animationDelay = rand(0, 0.8) + 's';
+    c.style.width = rand(7, 13) + 'px';
+    c.style.height = rand(12, 20) + 'px';
+    document.body.appendChild(c);
+    setTimeout(() => { try { c.remove(); } catch (e) {} }, 4600);
+  }
+}
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* =========================================================
+ *  事件绑定
+ * ========================================================= */
+$('#btnStart').addEventListener('click', () => { ensureAudio(); startLevel(state.level); });
+$('#btnReset').addEventListener('click', () => {
+  if (window.confirm('确定要重新开始吗？星星和错题记录都会被清空哦～')) {
+    state.stars = 0;
+    state.level = 1;
+    state.stats = {};
+    store.set('kkg2_stars', 0);
+    store.set('kkg2_level', 1);
+    store.set('kkg2_stats', {});
+    renderHome();
+    updateHUD();
+    toast('已重新开始，加油！');
+  }
+});
+$('#hudSound').addEventListener('click', () => {
+  state.soundOn = !state.soundOn;
+  store.set('kkg2_sound', state.soundOn);
+  updateHUD();
+  if (state.soundOn) { ensureAudio(); sfx.pop(); }
+  toast(state.soundOn ? '声音已开启' : '声音已关闭');
+});
+$('#quizRead').addEventListener('click', () => {
+  ensureAudio();
+  const q = state.questions[state.blockQ];
+  if (!q) return;
+  if (q.listen) speakEn(q.listen);
+  else speak('第' + (state.blockQ + 1) + '题。' + (q.read || q.question));
+});
+$('#quizListen').addEventListener('click', () => {
+  ensureAudio();
+  const q = state.questions[state.blockQ];
+  if (q && q.listen) speakEn(q.listen);
+});
+$('#btnQuit').addEventListener('click', () => {
+  if (state.game) stopMiniGame();
+  goHome();
+  toast('已退出小游戏');
+});
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+/* =========================================================
+ *  启动
+ * ========================================================= */
+renderHome();
+updateHUD();
+showScreen('home');
+
+/* PWA：离线缓存 + 添加到桌面（通过 http/https 打开时生效；file:// 打开时自动跳过） */
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
+
+/* 调试/演示入口：?auto=quiz|game|result&level=N */
+(function autoDemo() {
+  try {
+    const params = new URLSearchParams(location.search);
+    const auto = params.get('auto');
+    if (!auto) return;
+    const lv = clamp(parseInt(params.get('level') || '1', 10) || 1, 1, 999);
+    state.level = lv;
+    if (auto === 'quiz') {
+      startLevel(lv);
+    } else if (auto === 'game') {
+      ensureAudio();
+      state.block = 0;
+      startLevel(lv);
+      startMiniGame();
+    } else if (auto === 'result') {
+      state.block = 2;
+      state.levelCorrect = 26;
+      state.levelTotal = 30;
+      state.blockCorrect = 8;
+      state.blockEarned = 6;
+      showBlockResult();
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
